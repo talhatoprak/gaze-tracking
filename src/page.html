@@ -1,0 +1,130 @@
+<html itemscope="" itemtype="http://schema.org/SearchResultsPage" lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta content="origin" id="mref" name="referrer">
+  <title>dinosaurs - Google Search</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+  <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+    integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+    integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+    integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+    crossorigin="anonymous"></script>
+  <style>
+    .container-fluid {
+      height: 100vh;
+      background-image: url('./img/screen.png');
+      background-repeat: no-repeat;
+      background-size: cover;
+      background-position: center top;
+    }
+  </style>
+</head>
+
+<body class="srp tbo vasq wf-b" marginheight="3" topmargin="3" id="gsr">
+
+  
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12  text-center" style="margin-top: 15px;">
+        <button onclick="start()" id="btn_start" class="btn btn-outline-success my-2 my-sm-0" style="margin-left: 10px;"
+        type="button">Başla</button>
+      <button onclick="stop()" id="btn_stop" class="btn btn-outline-danger my-2 my-sm-0" style="margin-left: 10px;"
+        type="button">Bitir</button>
+      </div>
+     
+    </div>
+    <!-- <iframe src="https://getbootstrap.com/docs/4.4/components/navbar/" style="width: 100%;height: 100%;">
+    </iframe> -->
+  </div>
+
+
+
+
+
+  <script type="text/javascript" src="../searchgazer.js"></script>
+  <canvas width="11px" height="781px" id="renderCanvas"></canvas>
+  <script>
+    var mapdata = [];
+    //localStorage["key"] = value;
+        document.getElementById("btn_stop").style.display = "none";
+
+    window.onload = function () {
+      var wg;
+      start = () => {
+        document.getElementById("btn_start").style.display = "none";
+        document.getElementById("btn_stop").style.display = "inline-block";
+        console.log("start");
+        wg = webgazer.setRegression('ridge') /* currently must set regression and tracker */
+          .setTracker('clmtrackr')
+          .setGazeListener(function (data, clock) {
+            if (data != null) {
+              console.log(data);
+              mapdata.push({ x: data.x, y: data.y, value: 1 })
+            }
+
+            //   console.log(data); /* data is an object containing an x and y key which are the x and y prediction coordinates (no bounds limiting) */
+            //   console.log(clock); /* elapsed time in milliseconds since webgazer.begin() was called */
+          })
+          .begin()
+          .showPredictionPoints(true); /* shows a square every 100 milliseconds where current prediction is */
+      }
+      stop = () => {
+        console.log("stop");
+        console.log(mapdata);
+       
+        var x = JSON.stringify(mapdata);
+        localStorage["map"] = x.toString();
+        window.location.href = './heatmap.html';
+      }
+
+
+
+      var width = 320;
+      var height = 240;
+      var topDist = '0px';
+      var leftDist = '0px';
+
+      var setup = function () {
+        var video = document.getElementById('webgazerVideoFeed');
+        video.style.display = 'hidden';
+        video.style.position = 'absolute';
+        video.style.top = topDist;
+        video.style.left = leftDist;
+        video.width = width;
+        video.height = height;
+        video.style.margin = '0px';
+
+        webgazer.params.imgWidth = width;
+        webgazer.params.imgHeight = height;
+      };
+
+      function checkIfReady() {
+        if (webgazer.isReady()) {
+          setup();
+        } else {
+          setTimeout(checkIfReady, 100);
+        }
+      }
+      setTimeout(checkIfReady, 100);
+
+      window.onbeforeunload = function () {
+        webgazer.end();
+      };
+    };
+  </script>
+
+  <canvas width="11px" height="781px" id="renderCanvas" style="display:none;"></canvas>
+  <video id="webgazerVideoFeed" autoplay="" width="320" height="240"
+    style="display: none;position: absolute;top: 0px;left: 0px;margin: 0px;"></video>
+  <canvas id="webgazerVideoCanvas" width="320" height="240" style="display: none;"></canvas>
+
+</body>
+
+</html>
